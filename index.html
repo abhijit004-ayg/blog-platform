@@ -2,18 +2,51 @@
 <html>
 <head>
   <title>Nebula Blog</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    .post {
+      background: #f5f5f5;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 6px;
+    }
+  </style>
+
 </head>
 <body>
 
 <h1>Nebula Blog</h1>
 
-<input id="title" placeholder="Enter title"><br><br>
-<textarea id="content" placeholder="Enter content"></textarea><br><br>
+<input id="title" placeholder="Enter title">
+<br><br>
+
+<textarea id="content" placeholder="Enter content"></textarea>
+<br><br>
 
 <button onclick="addPost()">Add Post</button>
 
 <h2>Posts</h2>
+
 <div id="posts"></div>
 
 <script>
@@ -21,39 +54,71 @@
 const SUPABASE_URL = "https://ttzzikgwpidhqtfjhfpj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_JwYA0CpbpfZFXFm5wKwMdQ_zG28emLe";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 
 async function addPost() {
 
-  const title = document.getElementById("title").value;
-  const content = document.getElementById("content").value;
+  const title = document.getElementById("title").value.trim();
+  const content = document.getElementById("content").value.trim();
 
-  await supabase.from("posts").insert([
-    { title, content }
-  ]);
+  if (!title || !content) {
+    alert("Please enter title and content");
+    return;
+  }
+
+  const { error } = await client
+    .from("posts")
+    .insert([{ title, content }]);
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  // clear inputs
+  document.getElementById("title").value = "";
+  document.getElementById("content").value = "";
 
   loadPosts();
 }
 
+
+
 async function loadPosts() {
 
-  const { data } = await supabase.from("posts").select("*");
+  const { data, error } = await client
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
   const postsDiv = document.getElementById("posts");
   postsDiv.innerHTML = "";
 
   data.forEach(post => {
-    postsDiv.innerHTML += `
-      <div>
-        <h3>${post.title}</h3>
-        <p>${post.content}</p>
-        <hr>
-      </div>
+
+    const div = document.createElement("div");
+
+    div.className = "post";
+
+    div.innerHTML = `
+      <h3>${post.title}</h3>
+      <p>${post.content}</p>
     `;
+
+    postsDiv.appendChild(div);
+
   });
 
 }
 
+
+// load posts when page opens
 loadPosts();
 
 </script>
