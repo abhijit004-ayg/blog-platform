@@ -2,92 +2,152 @@
 <html>
 <head>
   <title>Nebula Blog</title>
-
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    * { box-sizing: border-box; }
+
     body {
-      font-family: Inter;
-      background: #0f172a;
-      color: white;
       margin: 0;
-      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f172a, #312e81);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      color: white;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .container {
-      max-width: 800px;
+      max-width: 1000px;
       margin: auto;
-      padding: 20px;
+      padding: 50px 20px;
     }
 
     h1 {
       text-align: center;
-      font-size: 40px;
-      margin-bottom: 30px;
+      font-size: 50px;
+      font-weight: 800;
+      background: linear-gradient(to right, #3b82f6, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 40px;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      margin-bottom: 25px;
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
     input, textarea {
       width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 8px;
+      padding: 14px;
+      margin-top: 12px;
+      border-radius: 12px;
       border: none;
-      outline: none;
-      background: #1e293b;
+      background: rgba(0,0,0,0.3);
       color: white;
+      font-size: 14px;
     }
 
     textarea {
-      height: 120px;
+      height: 140px;
+      resize: none;
     }
 
     button {
-      margin-top: 15px;
       padding: 10px 20px;
-      border-radius: 8px;
+      border-radius: 10px;
       border: none;
+      font-weight: 600;
       cursor: pointer;
-      font-weight: bold;
+      margin-top: 12px;
+      transition: all 0.3s ease;
     }
 
     .primary {
-      background: #3b82f6;
+      background: linear-gradient(135deg, #3b82f6, #9333ea);
       color: white;
     }
 
     .danger {
       background: #ef4444;
       color: white;
-      margin-left: 10px;
     }
 
     .edit {
       background: #f59e0b;
       color: white;
-      margin-left: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
     }
 
     .post {
-      background: #1e293b;
-      padding: 20px;
+      background: rgba(0,0,0,0.4);
+      padding: 25px;
+      border-radius: 18px;
       margin-top: 20px;
-      border-radius: 10px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
-    .auth {
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #1e293b;
-      border-radius: 10px;
+    .post:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 35px rgba(0,0,0,0.5);
     }
 
-    .hidden {
-      display: none;
+    .post h3 {
+      margin: 0 0 10px 0;
+      font-size: 22px;
     }
+
+    .post p {
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .actions {
+      margin-top: 15px;
+    }
+
+    .hidden { display: none; }
+
+    footer {
+      text-align: center;
+      margin-top: 80px;
+      font-size: 14px;
+      color: #94a3b8;
+      padding-bottom: 40px;
+    }
+
+    footer span {
+      font-weight: 600;
+      background: linear-gradient(to right, #3b82f6, #9333ea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
   </style>
 </head>
 <body>
@@ -96,32 +156,30 @@
 
   <h1>🚀 Nebula Blog</h1>
 
-  <!-- AUTH -->
-  <div class="auth" id="authBox">
-
+  <div class="glass" id="authCard">
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
-
     <button class="primary" onclick="signup()">Sign Up</button>
     <button class="primary" onclick="login()">Login</button>
-
   </div>
 
-  <button class="danger hidden" id="logoutBtn" onclick="logout()">Logout</button>
+  <div class="top-bar hidden" id="userBar">
+    <div id="userEmail"></div>
+    <button class="danger" onclick="logout()">Logout</button>
+  </div>
 
-  <!-- CREATE POST -->
-  <div id="editor" class="hidden">
-
+  <div class="glass hidden" id="editor">
     <input id="title" placeholder="Post title">
-    <textarea id="content" placeholder="Write your post..."></textarea>
-
+    <textarea id="content" placeholder="Write something amazing..."></textarea>
     <button class="primary" onclick="addPost()">Publish Post</button>
-
   </div>
 
   <h2>Posts</h2>
-
   <div id="posts"></div>
+
+  <footer>
+    Built with 💙 by <span>Abhijit Yuvaraj Ghatage</span>
+  </footer>
 
 </div>
 
@@ -132,154 +190,125 @@ const SUPABASE_KEY = "sb_publishable_JwYA0CpbpfZFXFm5wKwMdQ_zG28emLe";
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let user = null;
+let currentUser = null;
 let editingId = null;
 
-checkUser();
+init();
 
-async function checkUser() {
-
-  const { data } = await supabase.auth.getUser();
-
-  if (data.user) {
-
-    user = data.user;
-
-    document.getElementById("authBox").classList.add("hidden");
-    document.getElementById("editor").classList.remove("hidden");
-    document.getElementById("logoutBtn").classList.remove("hidden");
-
-    loadPosts();
-
+async function init() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    currentUser = user;
+    showLoggedIn();
   }
+  loadPosts();
+}
 
+function showLoggedIn() {
+  document.getElementById("authCard").classList.add("hidden");
+  document.getElementById("editor").classList.remove("hidden");
+  document.getElementById("userBar").classList.remove("hidden");
+  document.getElementById("userEmail").innerText = currentUser.email;
 }
 
 async function signup() {
-
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  await supabase.auth.signUp({ email, password });
+  const { error } = await supabase.auth.signUp({ email, password });
+  if (error) return alert(error.message);
 
-  alert("Signup success. Now login.");
-
+  alert("Signup successful. Now login.");
 }
 
 async function login() {
-
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return alert(error.message);
 
-  location.reload();
-
+  currentUser = data.user;
+  showLoggedIn();
+  loadPosts();
 }
 
 async function logout() {
-
   await supabase.auth.signOut();
-
   location.reload();
-
 }
 
 async function addPost() {
-
   const title = document.getElementById("title").value;
   const content = document.getElementById("content").value;
 
+  if (!title || !content) return alert("Fill all fields");
+
   if (editingId) {
-
-    await supabase
-      .from("posts")
-      .update({ title, content })
-      .eq("id", editingId);
-
+    await supabase.from("posts").update({ title, content }).eq("id", editingId);
     editingId = null;
-
   } else {
-
-    await supabase
-      .from("posts")
-      .insert({
-        title,
-        content,
-        user_id: user.id
-      });
-
+    await supabase.from("posts").insert({
+      title,
+      content,
+      user_id: currentUser.id
+    });
   }
 
   document.getElementById("title").value = "";
   document.getElementById("content").value = "";
-
   loadPosts();
-
 }
 
 async function loadPosts() {
-
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("posts")
     .select("*")
     .order("id", { ascending: false });
 
-  const postsDiv = document.getElementById("posts");
+  if (error) return console.log(error);
 
+  const postsDiv = document.getElementById("posts");
   postsDiv.innerHTML = "";
 
   data.forEach(post => {
+    const postDiv = document.createElement("div");
+    postDiv.className = "post";
 
-    postsDiv.innerHTML += `
-
-      <div class="post">
-
-        <h3>${post.title}</h3>
-
-        <p>${post.content}</p>
-
-        ${
-          user && user.id === post.user_id
-          ?
-          `
-          <button class="edit" onclick="editPost(${post.id}, '${post.title}', '${post.content}')">Edit</button>
-
-          <button class="danger" onclick="deletePost(${post.id})">Delete</button>
-          `
-          :
-          ""
-        }
-
-      </div>
-
+    postDiv.innerHTML = `
+      <h3>${post.title}</h3>
+      <p>${post.content}</p>
     `;
 
+    if (currentUser && post.user_id === currentUser.id) {
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "edit";
+      editBtn.innerText = "Edit";
+      editBtn.onclick = () => {
+        editingId = post.id;
+        document.getElementById("title").value = post.title;
+        document.getElementById("content").value = post.content;
+      };
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "danger";
+      deleteBtn.innerText = "Delete";
+      deleteBtn.onclick = async () => {
+        await supabase.from("posts").delete().eq("id", post.id);
+        loadPosts();
+      };
+
+      actions.appendChild(editBtn);
+      actions.appendChild(deleteBtn);
+      postDiv.appendChild(actions);
+    }
+
+    postsDiv.appendChild(postDiv);
   });
-
 }
-
-function editPost(id, title, content) {
-
-  editingId = id;
-
-  document.getElementById("title").value = title;
-  document.getElementById("content").value = content;
-
-}
-
-async function deletePost(id) {
-
-  await supabase
-    .from("posts")
-    .delete()
-    .eq("id", id);
-
-  loadPosts();
-
-}
-
-loadPosts();
 
 </script>
 
