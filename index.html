@@ -1,46 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Abhijit's Blog Platform</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial;
-      background-color: #0f172a;
-      color: white;
-      text-align: center;
-      padding: 50px;
-    }
-    h1 {
-      font-size: 40px;
-    }
-    p {
-      font-size: 20px;
-      color: #94a3b8;
-    }
-    button {
-      padding: 15px 30px;
-      font-size: 18px;
-      background: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #2563eb;
-    }
-  </style>
+  <title>Nebula Blog</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
 
-<h1>🚀 Welcome to Abhijit's Blog Platform</h1>
+<h1>Nebula Blog</h1>
 
-<p>Your website is now ready for Vercel deployment.</p>
+<input id="title" placeholder="Enter title"><br><br>
+<textarea id="content" placeholder="Enter content"></textarea><br><br>
 
-<button onclick="alert('Blog system coming next!')">
-Create First Post
-</button>
+<button onclick="addPost()">Add Post</button>
+
+<h2>Posts</h2>
+<div id="posts"></div>
+
+<script>
+
+const SUPABASE_URL = "https://ttzzikgwpidhqtfjhfpj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_JwYA0CpbpfZFXFm5wKwMdQ_zG28emLe";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function addPost() {
+
+  const title = document.getElementById("title").value;
+  const content = document.getElementById("content").value;
+
+  await supabase.from("posts").insert([
+    { title, content }
+  ]);
+
+  loadPosts();
+}
+
+async function loadPosts() {
+
+  const { data } = await supabase.from("posts").select("*");
+
+  const postsDiv = document.getElementById("posts");
+  postsDiv.innerHTML = "";
+
+  data.forEach(post => {
+    postsDiv.innerHTML += `
+      <div>
+        <h3>${post.title}</h3>
+        <p>${post.content}</p>
+        <hr>
+      </div>
+    `;
+  });
+
+}
+
+loadPosts();
+
+</script>
 
 </body>
 </html>
