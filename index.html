@@ -94,7 +94,7 @@
 </head>
 
 <body>
-
+<div class="container">
   <h1>🌌 Nebula Blog</h1>
 
   <div class="container">
@@ -104,8 +104,8 @@
       <h3>Login / Signup</h3>
       <input type="email" id="email" placeholder="Email">
       <input type="password" id="password" placeholder="Password">
-      <button onclick="signup()">Signup</button>
-      <button onclick="login()">Login</button>
+      <button class="publish" onclick="publish()">Publish</button>
+      <button class="logout" onclick="logout()">Logout</button>
     </div>
 
     <!-- CREATE POST -->
@@ -118,7 +118,7 @@
     </div>
 
     <!-- POSTS -->
-    <div id="posts"></div>
+    <div id="postCard" class="card">
 
   </div>
 
@@ -219,6 +219,6 @@
     });
 
   </script>
-
+</div>
 </body>
 </html>
