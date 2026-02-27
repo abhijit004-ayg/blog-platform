@@ -1,278 +1,200 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Nebula Blog</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f172a, #312e81);
-      background-size: 400% 400%;
-      animation: gradientBG 12s ease infinite;
-      color: white;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 50px 20px;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 50px;
-      font-weight: 800;
-      background: linear-gradient(to right, #3b82f6, #a855f7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 40px;
-    }
-
-    .glass {
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(20px);
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-      margin-bottom: 25px;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 14px;
-      margin-top: 12px;
-      border-radius: 12px;
-      border: none;
-      background: rgba(0,0,0,0.3);
-      color: white;
-      font-size: 14px;
-    }
-
-    textarea {
-      height: 140px;
-      resize: none;
-    }
-
-    button {
-      padding: 10px 20px;
-      border-radius: 10px;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 12px;
-      transition: all 0.3s ease;
-    }
-
-    .primary {
-      background: linear-gradient(135deg, #3b82f6, #9333ea);
-      color: white;
-    }
-
-    .danger {
-      background: #ef4444;
-      color: white;
-    }
-
-    .edit {
-      background: #f59e0b;
-      color: white;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    }
-
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .post {
-      background: rgba(0,0,0,0.4);
-      padding: 25px;
-      border-radius: 18px;
-      margin-top: 20px;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .post:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 35px rgba(0,0,0,0.5);
-    }
-
-    .post h3 {
-      margin: 0 0 10px 0;
-      font-size: 22px;
-    }
-
-    .post p {
-      color: #cbd5e1;
-      line-height: 1.6;
-    }
-
-    .actions {
-      margin-top: 15px;
-    }
-
-    .hidden { display: none; }
-
-    footer {
-      text-align: center;
-      margin-top: 80px;
-      font-size: 14px;
-      color: #94a3b8;
-      padding-bottom: 40px;
-    }
-
-    footer span {
-      font-weight: 600;
-      background: linear-gradient(to right, #3b82f6, #9333ea);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-  </style>
-</head>
-<body>
-
-<div class="container">
-
-  <h1>🚀 Nebula Blog</h1>
-
-  <div class="glass" id="authCard">
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
-    <button class="primary" onclick="signup()">Sign Up</button>
-    <button class="primary" onclick="login()">Login</button>
-  </div>
-
-  <div class="top-bar hidden" id="userBar">
-    <div id="userEmail"></div>
-    <button class="danger" onclick="logout()">Logout</button>
-  </div>
-
-  <div class="glass hidden" id="editor">
-    <input id="title" placeholder="Post title">
-    <textarea id="content" placeholder="Write something amazing..."></textarea>
-    <button class="primary" onclick="addPost()">Publish Post</button>
-  </div>
-
-  <h2>Posts</h2>
-  <div id="posts"></div>
-
-  <footer>
-    Built with 💙 by <span>Abhijit Yuvaraj Ghatage</span>
-  </footer>
-
-</div>
-
 <script>
 
 const SUPABASE_URL = "https://ttzzikgwpidhqtfjhfpj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_JwYA0CpbpfZFXFm5wKwMdQ_zG28emLe";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+/* Proper client initialization */
+const { createClient } = supabase;
+const client = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 let editingId = null;
 
-init();
+/* -------- INIT -------- */
 
 async function init() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) {
-    currentUser = user;
+
+  const { data } = await client.auth.getUser();
+
+  if (data.user) {
+    currentUser = data.user;
     showLoggedIn();
   }
+
   loadPosts();
 }
 
+init();
+
+/* Listen for login/logout automatically */
+
+client.auth.onAuthStateChange((event, session) => {
+
+  if (session?.user) {
+    currentUser = session.user;
+    showLoggedIn();
+  } else {
+    currentUser = null;
+  }
+
+});
+
+
+/* -------- UI -------- */
+
 function showLoggedIn() {
+
   document.getElementById("authCard").classList.add("hidden");
   document.getElementById("editor").classList.remove("hidden");
   document.getElementById("userBar").classList.remove("hidden");
+
   document.getElementById("userEmail").innerText = currentUser.email;
+
 }
+
+
+/* -------- SIGNUP -------- */
 
 async function signup() {
+
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const { error } = await supabase.auth.signUp({ email, password });
-  if (error) return alert(error.message);
+  if (!email || !password) {
+    alert("Enter email and password");
+    return;
+  }
+
+  const { error } = await client.auth.signUp({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
   alert("Signup successful. Now login.");
+
 }
 
+
+/* -------- LOGIN -------- */
+
 async function login() {
+
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return alert(error.message);
+  const { data, error } = await client.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
   currentUser = data.user;
+
   showLoggedIn();
+
   loadPosts();
+
 }
+
+
+/* -------- LOGOUT -------- */
 
 async function logout() {
-  await supabase.auth.signOut();
+
+  await client.auth.signOut();
+
   location.reload();
+
 }
 
+
+/* -------- CREATE / UPDATE POST -------- */
+
 async function addPost() {
+
   const title = document.getElementById("title").value;
   const content = document.getElementById("content").value;
 
-  if (!title || !content) return alert("Fill all fields");
+  if (!title || !content) {
+    alert("Fill all fields");
+    return;
+  }
+
+  if (!currentUser) {
+    alert("You must login first");
+    return;
+  }
 
   if (editingId) {
-    await supabase.from("posts").update({ title, content }).eq("id", editingId);
+
+    const { error } = await client
+      .from("posts")
+      .update({ title, content })
+      .eq("id", editingId);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
     editingId = null;
+
   } else {
-    await supabase.from("posts").insert({
-      title,
-      content,
-      user_id: currentUser.id
-    });
+
+    const { error } = await client
+      .from("posts")
+      .insert({
+        title: title,
+        content: content,
+        user_id: currentUser.id
+      });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
   }
 
   document.getElementById("title").value = "";
   document.getElementById("content").value = "";
+
   loadPosts();
+
 }
 
+
+/* -------- LOAD POSTS -------- */
+
 async function loadPosts() {
-  const { data, error } = await supabase
+
+  const { data, error } = await client
     .from("posts")
     .select("*")
     .order("id", { ascending: false });
 
-  if (error) return console.log(error);
+  if (error) {
+    console.log(error);
+    return;
+  }
 
   const postsDiv = document.getElementById("posts");
+
   postsDiv.innerHTML = "";
 
   data.forEach(post => {
+
     const postDiv = document.createElement("div");
+
     postDiv.className = "post";
 
     postDiv.innerHTML = `
@@ -281,36 +203,61 @@ async function loadPosts() {
     `;
 
     if (currentUser && post.user_id === currentUser.id) {
+
       const actions = document.createElement("div");
+
       actions.className = "actions";
 
       const editBtn = document.createElement("button");
+
       editBtn.className = "edit";
+
       editBtn.innerText = "Edit";
+
       editBtn.onclick = () => {
+
         editingId = post.id;
+
         document.getElementById("title").value = post.title;
+
         document.getElementById("content").value = post.content;
+
       };
 
       const deleteBtn = document.createElement("button");
+
       deleteBtn.className = "danger";
+
       deleteBtn.innerText = "Delete";
+
       deleteBtn.onclick = async () => {
-        await supabase.from("posts").delete().eq("id", post.id);
+
+        const { error } = await client
+          .from("posts")
+          .delete()
+          .eq("id", post.id);
+
+        if (error) {
+          alert(error.message);
+          return;
+        }
+
         loadPosts();
+
       };
 
       actions.appendChild(editBtn);
+
       actions.appendChild(deleteBtn);
+
       postDiv.appendChild(actions);
+
     }
 
     postsDiv.appendChild(postDiv);
+
   });
+
 }
 
 </script>
-
-</body>
-</html>
